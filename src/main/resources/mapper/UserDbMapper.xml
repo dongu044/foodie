@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.foodie.user.mapper.UserDbMapper">
+  <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO user (user_id, password, nickname, email, role)
+    VALUES (#{userId}, #{password}, #{nickname}, #{email}, #{role})
+  </insert>
+  <select id="findByUserId" parameterType="String" resultType="String">
+    SELECT user_id FROM user WHERE user_id=#{userId}
+  </select>
+  <select id="findByNickname" parameterType="String" resultType="String">
+    SELECT nickname FROM user WHERE nickname=#{nickname}
+  </select>
+  <update id="clear">
+    TRUNCATE TABLE user
+  </update>
+</mapper>
