@@ -19,7 +19,7 @@ public class UserSignUpDto {
 
   @NotBlank(message="비밀번호는 필수 입력값입니다.")
   @Pattern(
-      regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,20}$",
+      regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z\\d]).{10,20}$",
       message = "비밀번호는 영문, 숫자, 특수문자를 모두 포함하여 10자 이상, 20자 이하이어야 합니다."
   )
   private String password;
