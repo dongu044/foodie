@@ -6,7 +6,7 @@ import main.foodie.domain.user.domain.Role;
 
 @Getter
 @AllArgsConstructor
-public class UserResponseDto {
+public class UserApiDto {
 
   private String userId;
   private String nickname;

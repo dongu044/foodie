@@ -1,12 +1,13 @@
 package main.foodie.domain.user.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import main.foodie.common.exception.BusinessException;
 import main.foodie.common.exception.errorcode.domain.UserErrorCode;
 import main.foodie.domain.user.domain.Role;
 import main.foodie.domain.user.domain.User;
-import main.foodie.domain.user.dto.UserLoginDto;
-import main.foodie.domain.user.dto.UserResponseDto;
+import main.foodie.domain.user.dto.UserValidationDto;
+import main.foodie.domain.user.dto.UserApiDto;
 import main.foodie.domain.user.dto.UserSignUpDto;
 import main.foodie.domain.user.mapper.UserDbMapper;
 import main.foodie.domain.user.mapper.UserMapper;
@@ -49,14 +50,28 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserResponseDto login(UserLoginDto user) {
-    User userData = userDbMapper.findByUserId(user.getUserId())
+  public UserApiDto login(UserValidationDto request) {
+    User userData = userDbMapper.findByUserId(request.getUserId())
         .orElseThrow(()-> new BusinessException(UserErrorCode.USERID_INVALID));
 
-    if (!passwordEncoder.matches(user.getPassword(), userData.getPassword())) {
+    validatePassword(request.getPassword(), userData.getPassword());
+
+    return userMapper.toApiDto(userData);
+  }
+
+  @Override
+  public void deleteUser(UserApiDto request, String password) {
+    User userData = userDbMapper.findByUserId(request.getUserId())
+        .orElseThrow(()-> new BusinessException(UserErrorCode.USERID_INVALID));
+
+    validatePassword(password, userData.getPassword());
+
+    userDbMapper.deleteUser(userData.getUserId());
+  }
+
+  private void validatePassword(String rawPassword, String encodedPassword) {
+    if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
       throw new BusinessException(UserErrorCode.PASSWORD_INVALID);
     }
-
-    return userMapper.toResponseDto(userData);
   }
 }

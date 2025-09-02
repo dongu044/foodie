@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="main.foodie.domain.user.mapper.UserDbMapper">
+<!-- signup -->
   <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO user (user_id, password, nickname, email, role)
     VALUES (#{userId}, #{password}, #{nickname}, #{email}, #{role})
   </insert>
+<!-- userId로 user 찾기 -->
   <select id="findByUserId" parameterType="String" resultType="User">
     SELECT * FROM user WHERE user_id=#{userId}
   </select>
+<!-- nickname 중복검사 -->
   <select id="findByNickname" parameterType="String" resultType="String">
     SELECT nickname FROM user WHERE nickname=#{nickname}
   </select>
+<!-- user 제거 -->
+  <delete id="deleteUser" parameterType="String">
+    DELETE FROM user WHERE user_id=#{userId}
+  </delete>
+
   <update id="clear">
     TRUNCATE TABLE user
   </update>

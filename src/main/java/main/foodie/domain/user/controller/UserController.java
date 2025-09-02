@@ -1,12 +1,13 @@
 package main.foodie.domain.user.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.foodie.common.reponse.ApiResponse;
-import main.foodie.domain.user.dto.UserResponseDto;
+import main.foodie.domain.user.dto.UserApiDto;
 import main.foodie.domain.user.dto.UserSignUpDto;
 import main.foodie.domain.user.service.UserService;
-import main.foodie.domain.user.dto.UserLoginDto;
+import main.foodie.domain.user.dto.UserValidationDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +31,19 @@ public class UserController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<UserResponseDto>> login(@Validated @RequestBody UserLoginDto user) {
+  public ResponseEntity<ApiResponse<Void>> login(
+      @Validated @RequestBody UserValidationDto user, HttpSession session) {
     log.info("로그인 시도: {}", user.getUserId());
-    UserResponseDto responseDto = userService.login(user);
-    return ResponseEntity.ok(new ApiResponse<>("로그인 성공", responseDto));
+    UserApiDto apiDto = userService.login(user);
+    session.setAttribute("user", apiDto);
+    return ResponseEntity.ok(new ApiResponse<>("로그인 성공"));
+  }
+
+  @PostMapping("/delete")
+  public ResponseEntity<ApiResponse<Void>> delete(@Validated @RequestBody String password, HttpSession session) {
+    UserApiDto user = (UserApiDto) session.getAttribute("user");
+    userService.deleteUser(user, password);
+    session.invalidate();
+    return ResponseEntity.ok(new ApiResponse<>("회원 탈퇴 성공"));
   }
 }

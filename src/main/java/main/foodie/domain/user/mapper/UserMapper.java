@@ -2,9 +2,9 @@ package main.foodie.domain.user.mapper;
 
 import java.util.List;
 import main.foodie.domain.user.domain.User;
-import main.foodie.domain.user.dto.UserResponseDto;
+import main.foodie.domain.user.dto.UserApiDto;
 import main.foodie.domain.user.dto.UserSignUpDto;
-import main.foodie.domain.user.dto.UserLoginDto;
+import main.foodie.domain.user.dto.UserValidationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -15,7 +15,7 @@ public interface UserMapper {
   @Mapping(target = "role", constant = "USER")
   User signUpDtoToDomain(UserSignUpDto userDto);
 
-  UserResponseDto toResponseDto(User user);
+  UserApiDto toApiDto(User user);
 
-  List<UserResponseDto> toResponseDtoList(List<User> Users);
+  List<UserApiDto> toApiDtoList(List<User> Users);
 }

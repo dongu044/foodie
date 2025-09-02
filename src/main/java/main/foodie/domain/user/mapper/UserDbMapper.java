@@ -3,6 +3,7 @@ package main.foodie.domain.user.mapper;
 import java.util.List;
 import java.util.Optional;
 import main.foodie.domain.user.domain.User;
+import main.foodie.domain.user.dto.UserValidationDto;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
@@ -12,6 +13,8 @@ public interface UserDbMapper {
   Optional<User> findByUserId(String userId);
 
   Optional<String> findByNickname(String nickname);
+
+  void deleteUser(String userId);
 
   List<User> findAll();
 
