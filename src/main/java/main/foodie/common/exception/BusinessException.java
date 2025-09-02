@@ -1,8 +1,7 @@
-package main.foodie.exception;
+package main.foodie.common.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import main.foodie.exception.errorcode.ErrorCode;
+import main.foodie.common.exception.errorcode.ErrorCode;
 
 @Getter
 public class BusinessException extends RuntimeException{

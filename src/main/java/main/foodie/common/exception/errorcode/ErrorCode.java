@@ -1,4 +1,4 @@
-package main.foodie.exception.errorcode;
+package main.foodie.common.exception.errorcode;
 
 import org.springframework.http.HttpStatus;
 

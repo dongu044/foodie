@@ -1,4 +1,4 @@
-package main.foodie.user.domain;
+package main.foodie.domain.user.domain;
 
 public enum Role {
   MANAGER("매니저"),

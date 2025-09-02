@@ -1,12 +1,13 @@
-package main.foodie.exception.errorcode;
+package main.foodie.common.exception.errorcode.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import main.foodie.common.exception.errorcode.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum UserErrorCode implements ErrorCode{
+public enum UserErrorCode implements ErrorCode {
 
   USERID_DUPLICATED("USERID_DUPLICATED","error.user.userid.duplicated", HttpStatus.BAD_REQUEST),
   NICKNAME_DUPLICATED("NICKNAME_DUPLICATED","error.user.nickname.duplicated", HttpStatus.BAD_REQUEST),
