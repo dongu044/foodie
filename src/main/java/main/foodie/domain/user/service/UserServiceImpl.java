@@ -10,6 +10,7 @@ import main.foodie.domain.user.dto.UserResponseDto;
 import main.foodie.domain.user.dto.UserSignUpDto;
 import main.foodie.domain.user.mapper.UserDbMapper;
 import main.foodie.domain.user.mapper.UserMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,11 +19,14 @@ public class UserServiceImpl implements UserService {
 
   private final UserDbMapper userDbMapper;
   private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public void signUp(UserSignUpDto user) {
     validateDuplication(user);
     User newUser = userMapper.signUpDtoToDomain(user);
+    String encodedPassword = passwordEncoder.encode(user.getPassword());
+    newUser.setPassword(encodedPassword);
     newUser.setRole(Role.USER);
     userDbMapper.save(newUser);
   }
@@ -49,7 +53,7 @@ public class UserServiceImpl implements UserService {
     User userData = userDbMapper.findByUserId(user.getUserId())
         .orElseThrow(()-> new BusinessException(UserErrorCode.USERID_INVALID));
 
-    if (!userData.getPassword().equals(user.getPassword())) {
+    if (!passwordEncoder.matches(user.getPassword(), userData.getPassword())) {
       throw new BusinessException(UserErrorCode.PASSWORD_INVALID);
     }
 
