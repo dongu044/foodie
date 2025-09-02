@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
   public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
-    return buildErrorResponse(e.getCode(), e.getMessage(), HttpStatus.BAD_REQUEST);
+    return buildErrorResponse(e.getErrorCode().getCode(), e.getMessage(), e.getErrorCode().getStatus());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
