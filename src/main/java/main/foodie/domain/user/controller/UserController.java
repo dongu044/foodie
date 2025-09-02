@@ -39,6 +39,13 @@ public class UserController {
     return ResponseEntity.ok(new ApiResponse<>("로그인 성공"));
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
+    session.invalidate();
+    return ResponseEntity.ok(new ApiResponse<>("로그아웃"));
+
+  }
+
   @PostMapping("/delete")
   public ResponseEntity<ApiResponse<Void>> delete(@Validated @RequestBody String password, HttpSession session) {
     UserApiDto user = (UserApiDto) session.getAttribute("user");
