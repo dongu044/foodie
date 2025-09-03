@@ -1,8 +1,8 @@
-package main.foodie.domain.user.dto;
+package main.foodie.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import main.foodie.domain.user.domain.Role;
+import main.foodie.domain.user.Role;
 
 @Getter
 @AllArgsConstructor

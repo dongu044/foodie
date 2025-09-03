@@ -1,4 +1,4 @@
-package main.foodie.domain.user.dto;
+package main.foodie.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

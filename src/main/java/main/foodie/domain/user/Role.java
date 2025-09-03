@@ -1,5 +1,8 @@
-package main.foodie.domain.user.domain;
+package main.foodie.domain.user;
 
+import lombok.Getter;
+
+@Getter
 public enum Role {
   MANAGER("매니저"),
   USER("일반회원");
@@ -8,9 +11,5 @@ public enum Role {
 
   Role(String description) {
     this.description = description;
-  }
-
-  public String getDescription() {
-    return description;
   }
 }

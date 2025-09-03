@@ -1,16 +1,15 @@
-package main.foodie.domain.user.service;
+package main.foodie.service;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import main.foodie.common.exception.BusinessException;
 import main.foodie.common.exception.errorcode.domain.UserErrorCode;
-import main.foodie.domain.user.domain.Role;
-import main.foodie.domain.user.domain.User;
-import main.foodie.domain.user.dto.UserValidationDto;
-import main.foodie.domain.user.dto.UserApiDto;
-import main.foodie.domain.user.dto.UserSignUpDto;
-import main.foodie.domain.user.mapper.UserDbMapper;
-import main.foodie.domain.user.mapper.UserMapper;
+import main.foodie.domain.user.Role;
+import main.foodie.domain.user.User;
+import main.foodie.dto.user.UserApiDto;
+import main.foodie.dto.user.UserSignUpDto;
+import main.foodie.dto.user.UserValidationDto;
+import main.foodie.mapper.UserDbMapper;
+import main.foodie.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public void signUp(UserSignUpDto user) {
-    validateDuplication(user);
+    isDuplicated(user);
     User newUser = userMapper.signUpDtoToDomain(user);
     String encodedPassword = passwordEncoder.encode(user.getPassword());
     newUser.setPassword(encodedPassword);
@@ -32,18 +31,18 @@ public class UserServiceImpl implements UserService {
     userDbMapper.save(newUser);
   }
 
-  private void validateDuplication(UserSignUpDto newUser) {
-    validateDuplicatedId(newUser);
-    validateDuplicateNickname(newUser);
+  private void isDuplicated(UserSignUpDto newUser) {
+    isDuplicatedUserId(newUser);
+    isDuplicatedNickname(newUser);
   }
 
-  private void validateDuplicateNickname(UserSignUpDto newUser) {
+  private void isDuplicatedNickname(UserSignUpDto newUser) {
     if (userDbMapper.findByNickname(newUser.getNickname()).isPresent()) {
       throw new BusinessException(UserErrorCode.NICKNAME_DUPLICATED);
     }
   }
 
-  private void validateDuplicatedId(UserSignUpDto newUser) {
+  private void isDuplicatedUserId(UserSignUpDto newUser) {
     if (userDbMapper.findByUserId(newUser.getUserId()).isPresent()) {
       throw new BusinessException(UserErrorCode.USERID_DUPLICATED);
     }
@@ -51,12 +50,16 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserApiDto login(UserValidationDto request) {
-    User userData = userDbMapper.findByUserId(request.getUserId())
-        .orElseThrow(()-> new BusinessException(UserErrorCode.USERID_INVALID));
+    User userData = isValidUserId(request.getUserId());
 
     validatePassword(request.getPassword(), userData.getPassword());
 
     return userMapper.toApiDto(userData);
+  }
+
+  public User isValidUserId(String userId) {
+    return userDbMapper.findByUserId(userId)
+        .orElseThrow(() -> new BusinessException(UserErrorCode.USERID_INVALID));
   }
 
   @Override

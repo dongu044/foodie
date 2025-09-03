@@ -1,4 +1,4 @@
-package main.foodie.domain.user.dto;
+package main.foodie.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

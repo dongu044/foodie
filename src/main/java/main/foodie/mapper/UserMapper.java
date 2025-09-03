@@ -1,10 +1,9 @@
-package main.foodie.domain.user.mapper;
+package main.foodie.mapper;
 
 import java.util.List;
-import main.foodie.domain.user.domain.User;
-import main.foodie.domain.user.dto.UserApiDto;
-import main.foodie.domain.user.dto.UserSignUpDto;
-import main.foodie.domain.user.dto.UserValidationDto;
+import main.foodie.domain.user.User;
+import main.foodie.dto.user.UserApiDto;
+import main.foodie.dto.user.UserSignUpDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

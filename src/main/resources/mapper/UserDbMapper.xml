@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="main.foodie.domain.user.mapper.UserDbMapper">
+<mapper namespace="main.foodie.mapper.UserDbMapper">
 <!-- signup -->
   <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO user (user_id, password, nickname, email, role)
@@ -18,8 +18,4 @@
   <delete id="deleteUser" parameterType="String">
     DELETE FROM user WHERE user_id=#{userId}
   </delete>
-
-  <update id="clear">
-    TRUNCATE TABLE user
-  </update>
 </mapper>

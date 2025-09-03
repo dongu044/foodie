@@ -1,9 +1,8 @@
-package main.foodie.domain.user.mapper;
+package main.foodie.mapper;
 
 import java.util.List;
 import java.util.Optional;
-import main.foodie.domain.user.domain.User;
-import main.foodie.domain.user.dto.UserValidationDto;
+import main.foodie.domain.user.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
