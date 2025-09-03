@@ -1,14 +1,17 @@
 package main.foodie.service;
 
+import main.foodie.domain.board.Post;
 import main.foodie.dto.board.CommentDTO;
-import main.foodie.dto.board.CreatePostDTO;
-import main.foodie.dto.board.UpdatePostDTO;
+import main.foodie.dto.board.PostCreateRequestDTO;
+import main.foodie.dto.board.PostResponseDTO;
+import main.foodie.dto.board.PostUpdateRequestDTO;
+import main.foodie.dto.user.UserApiDto;
 
 public interface BoardService {
 
-  void createPost(CreatePostDTO createRequest, String userId);
+  Long createPost(PostCreateRequestDTO createRequest, String userId);
 
-  UpdatePostDTO updatePost(Long id);
+  PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest);
 
   void deletePost(Long id);
 

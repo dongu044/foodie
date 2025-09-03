@@ -1,18 +1,14 @@
-package main.foodie.domain.board;
+package main.foodie.dto.board;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import main.foodie.domain.board.Visibility;
 
-@Data
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
-public class Post {
+public class PostResponseDTO {
 
-  private Long id;
-  private Long authorId;
   private String nickname;
 
   private String category;
@@ -26,7 +22,6 @@ public class Post {
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private LocalDateTime deletedAt;
 
   public String getVisibility() {
     return visibility.name();

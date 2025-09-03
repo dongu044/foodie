@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="main.foodie.mapper.BoardDbMapper">
   <!-- insert -->
   <!-- 신규 post -->
@@ -23,13 +24,15 @@
   </select>
   <!-- 키워드로 title, content 찾기 -->
   <select id="findPostByTitleAndContent" parameterType="String" resultType="Post">
-    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%',
-    #{keyword}, '%')
+    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
   </select>
+  <update id="updatePost" parameterType="PostUpdateRequestDTO">
+    UPDATE post SET nickname=#{nickname}, category=#{category}, title=#{title}, visibility=#{visibility}, content=#{content} WHERE id=#{id}
+  </update>
 
   <!-- delete -->
   <!-- user 제거 -->
   <delete id="deletePost" parameterType="String">
-    DELETE FROM post WHERE post_id=#{id}
+    DELETE FROM post WHERE id=#{id}
   </delete>
 </mapper>

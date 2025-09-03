@@ -22,13 +22,13 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
-  public void signUp(UserSignUpDto user) {
+  public Long signUp(UserSignUpDto user) {
     isDuplicated(user);
     User newUser = userMapper.signUpDtoToDomain(user);
     String encodedPassword = passwordEncoder.encode(user.getPassword());
     newUser.setPassword(encodedPassword);
     newUser.setRole(Role.USER);
-    userDbMapper.save(newUser);
+    return userDbMapper.save(newUser);
   }
 
   private void isDuplicated(UserSignUpDto newUser) {

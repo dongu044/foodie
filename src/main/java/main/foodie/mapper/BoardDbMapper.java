@@ -3,12 +3,13 @@ package main.foodie.mapper;
 import java.util.List;
 import java.util.Optional;
 import main.foodie.domain.board.Post;
+import main.foodie.dto.board.PostUpdateRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface BoardDbMapper {
 
-  void createPost(Post post);
+  Long createPost(Post post);
 
   Optional<Post> findPostById(Long id);
 
@@ -17,6 +18,8 @@ public interface BoardDbMapper {
   List<Post> findPostByTitle(String keyword);
 
   List<Post> findPostByTitleAndContent(String keyword);
+
+  int updatePost(PostUpdateRequestDTO request);
 
   void deletePost(Long id);
 

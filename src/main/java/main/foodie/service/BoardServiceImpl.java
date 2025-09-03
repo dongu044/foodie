@@ -1,14 +1,19 @@
 package main.foodie.service;
 
 import lombok.RequiredArgsConstructor;
+import main.foodie.common.exception.BusinessException;
+import main.foodie.common.exception.errorcode.domain.BoardErrorCode;
 import main.foodie.domain.board.Post;
 import main.foodie.domain.user.User;
 import main.foodie.dto.board.CommentDTO;
-import main.foodie.dto.board.CreatePostDTO;
-import main.foodie.dto.board.UpdatePostDTO;
+import main.foodie.dto.board.PostCreateRequestDTO;
+import main.foodie.dto.board.PostResponseDTO;
+import main.foodie.dto.board.PostUpdateRequestDTO;
+import main.foodie.dto.user.UserApiDto;
 import main.foodie.mapper.BoardDbMapper;
 import main.foodie.mapper.BoardMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,17 +24,31 @@ public class BoardServiceImpl implements BoardService{
   private final UserService userService;
 
   @Override
-  public void createPost(CreatePostDTO createRequest, String userId) {
+  public Long createPost(PostCreateRequestDTO createRequest, String userId) {
     User user = userService.isValidUserId(userId);
 
     Post post = boardMapper.toPost(createRequest, user);
 
-    boardDbMapper.createPost(post);
+    return boardDbMapper.createPost(post);
   }
 
   @Override
-  public UpdatePostDTO updatePost(Long id) {
-    return null;
+  @Transactional
+  public PostResponseDTO updatePost(PostUpdateRequestDTO request) {
+    Post post = getPost(request);
+
+    int affectedRows = boardDbMapper.updatePost(request);
+    if (affectedRows == 0) {
+      throw new BusinessException(BoardErrorCode.POST_UPDATE_FAILED);
+    }
+
+    boardMapper.updatePostFromRequest(request, post);
+    return boardMapper.toPostResponseDTO(post);
+  }
+
+  private Post getPost(PostUpdateRequestDTO request) {
+    return boardDbMapper.findPostById(request.getId())
+        .orElseThrow(() -> new BusinessException(BoardErrorCode.POST_NOT_FOUND));
   }
 
   @Override

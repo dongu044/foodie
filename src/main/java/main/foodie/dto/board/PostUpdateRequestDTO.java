@@ -9,10 +9,13 @@ import main.foodie.domain.board.Visibility;
 
 @Data
 @AllArgsConstructor
-public class UpdatePostDTO {
+public class PostUpdateRequestDTO {
 
   @NotNull
   private Long id;
+
+  @NotBlank
+  private String nickname;
 
   @NotBlank
   private String category;
@@ -20,7 +23,7 @@ public class UpdatePostDTO {
   @Size(max=50)
   private String title;
 
-  @NotBlank
+  @NotNull
   private Visibility visibility;
 
   @NotBlank

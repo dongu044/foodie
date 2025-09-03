@@ -7,7 +7,7 @@ import main.foodie.dto.user.UserValidationDto;
 
 public interface UserService {
 
-  void signUp(UserSignUpDto user);
+  Long signUp(UserSignUpDto user);
 
   UserApiDto login(UserValidationDto user);
 
