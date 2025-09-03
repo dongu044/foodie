@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.foodie.mapper.BoardDbMapper">
+  <!-- insert -->
+  <!-- 신규 post -->
+  <insert id="createPost" parameterType="Post" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO post (author_id, nickname, category, title, visibility, content)
+    VALUES (#{authorId}, #{nickname}, #{category}, #{title}, #{visibility}, #{content})
+  </insert>
+
+  <!-- select -->
+  <!-- post 번호로 post 찾기 -->
+  <select id="findPostById" parameterType="Long" resultType="Post">
+    SELECT * FROM post WHERE id=#{id}
+  </select>
+  <!-- nickname 으로 post 찾기 -->
+  <select id="findPostByAuthor" parameterType="String" resultType="Post">
+    SELECT * FROM post WHERE nickname=#{nickname}
+  </select>
+  <!-- 키워드로 title 찾기 -->
+  <select id="findPostByTitle" parameterType="String" resultType="Post">
+    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%')
+  </select>
+  <!-- 키워드로 title, content 찾기 -->
+  <select id="findPostByTitleAndContent" parameterType="String" resultType="Post">
+    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%',
+    #{keyword}, '%')
+  </select>
+
+  <!-- delete -->
+  <!-- user 제거 -->
+  <delete id="deletePost" parameterType="String">
+    DELETE FROM post WHERE post_id=#{id}
+  </delete>
+</mapper>
