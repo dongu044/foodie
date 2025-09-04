@@ -11,7 +11,7 @@ public interface BoardService {
 
   Long createPost(PostCreateRequestDTO createRequest, String userId);
 
-  PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest);
+  PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest, Long id);
 
   void deletePost(Long id);
 

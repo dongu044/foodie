@@ -34,11 +34,10 @@ public class BoardServiceImpl implements BoardService{
 
   @Override
   @Transactional
-  public PostResponseDTO updatePost(PostUpdateRequestDTO request) {
-    Post post = getPost(request);
+  public PostResponseDTO updatePost(PostUpdateRequestDTO request, Long id) {
+    Post post = validatePost(request, id);
 
-    int affectedRows = boardDbMapper.updatePost(request);
-    if (affectedRows == 0) {
+    if (boardDbMapper.updatePost(request, id) == 0) {
       throw new BusinessException(BoardErrorCode.POST_UPDATE_FAILED);
     }
 
@@ -46,8 +45,8 @@ public class BoardServiceImpl implements BoardService{
     return boardMapper.toPostResponseDTO(post);
   }
 
-  private Post getPost(PostUpdateRequestDTO request) {
-    return boardDbMapper.findPostById(request.getId())
+  private Post validatePost(PostUpdateRequestDTO request, Long id) {
+    return boardDbMapper.findPostById(id)
         .orElseThrow(() -> new BusinessException(BoardErrorCode.POST_NOT_FOUND));
   }
 

@@ -12,6 +12,7 @@ import main.foodie.dto.user.UserApiDto;
 import main.foodie.service.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +33,8 @@ public class BoardController {
   }
 
   @PostMapping("/posts/update/{id}")
-  public ResponseEntity<ApiResponse<PostResponseDTO>> updatePost(@Validated @RequestBody PostUpdateRequestDTO request) {
-    PostResponseDTO postResponseDTO = boardService.updatePost(request);
+  public ResponseEntity<ApiResponse<PostResponseDTO>> updatePost(@Validated @RequestBody PostUpdateRequestDTO request, @PathVariable Long id) {
+    PostResponseDTO postResponseDTO = boardService.updatePost(request, id);
     return ResponseEntity.ok(new ApiResponse<>("게시글 수정완료", postResponseDTO));
   }
 }

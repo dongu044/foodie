@@ -11,9 +11,6 @@ import main.foodie.domain.board.Visibility;
 @AllArgsConstructor
 public class PostUpdateRequestDTO {
 
-  @NotNull
-  private Long id;
-
   @NotBlank
   private String nickname;
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 import main.foodie.domain.board.Post;
 import main.foodie.dto.board.PostUpdateRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface BoardDbMapper {
@@ -21,7 +22,7 @@ public interface BoardDbMapper {
 
   List<Post> findPostByTitleAndContentAndNickname(String keyword);
 
-  int updatePost(PostUpdateRequestDTO request);
+  int updatePost(@Param("request") PostUpdateRequestDTO request, @Param("id") Long id);
 
   void deletePost(Long id);
 

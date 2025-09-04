@@ -16,8 +16,8 @@ public class Comment {
   private Long authorId;
   private String nickname;
 
-  private String content;
   private Visibility visibility;
+  private String content;
   private int likeCount;
 
   private LocalDateTime createdAt;

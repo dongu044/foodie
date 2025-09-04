@@ -33,8 +33,8 @@
   </select>
   <!-- post 업데이트 -->
   <update id="updatePost" parameterType="PostUpdateRequestDTO">
-    UPDATE post SET nickname=#{nickname}, category=#{category}, title=#{title},
-    visibility=#{visibility}, content=#{content} WHERE id=#{id}
+    UPDATE post SET nickname=#{request.nickname}, category=#{request.category}, title=#{request.title},
+    visibility=#{request.visibility}, content=#{request.content} WHERE id=#{id}
   </update>
 
   <!-- delete -->
