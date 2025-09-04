@@ -13,11 +13,13 @@ public interface BoardDbMapper {
 
   Optional<Post> findPostById(Long id);
 
-  List<Post> findPostByAuthor(String nickname);
+  List<Post> findPostByNickname(String nickname);
 
   List<Post> findPostByTitle(String keyword);
 
   List<Post> findPostByTitleAndContent(String keyword);
+
+  List<Post> findPostByTitleAndContentAndNickname(String keyword);
 
   int updatePost(PostUpdateRequestDTO request);
 

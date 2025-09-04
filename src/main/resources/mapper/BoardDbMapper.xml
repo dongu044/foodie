@@ -12,22 +12,29 @@
   <!-- select -->
   <!-- post 번호로 post 찾기 -->
   <select id="findPostById" parameterType="Long" resultType="Post">
-    SELECT * FROM post WHERE id=#{id}
+    SELECT * FROM post WHERE id=#{id} ORDER BY created_at DESC
   </select>
   <!-- nickname 으로 post 찾기 -->
-  <select id="findPostByAuthor" parameterType="String" resultType="Post">
-    SELECT * FROM post WHERE nickname=#{nickname}
+  <select id="findPostByNickname" parameterType="String" resultType="Post">
+    SELECT * FROM post WHERE MATCH(nickname) AGAINST(#{nickname} IN NATURAL LANGUAGE MODE)
   </select>
   <!-- 키워드로 title 찾기 -->
   <select id="findPostByTitle" parameterType="String" resultType="Post">
-    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%')
+    SELECT * FROM post WHERE MATCH(title) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
   </select>
   <!-- 키워드로 title, content 찾기 -->
   <select id="findPostByTitleAndContent" parameterType="String" resultType="Post">
-    SELECT * FROM post WHERE title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+    SELECT * FROM post WHERE MATCH(title, content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
   </select>
+  <!-- 키워드로 title, content, nickname 찾기 -->
+  <select id="findPostByTitleAndContentAndNickname" parameterType="String" resultType="Post">
+    SELECT * FROM post WHERE MATCH(title, content, nickname) AGAINST(#{keyword} IN NATURAL LANGUAGE
+    MODE)
+  </select>
+  <!-- post 업데이트 -->
   <update id="updatePost" parameterType="PostUpdateRequestDTO">
-    UPDATE post SET nickname=#{nickname}, category=#{category}, title=#{title}, visibility=#{visibility}, content=#{content} WHERE id=#{id}
+    UPDATE post SET nickname=#{nickname}, category=#{category}, title=#{title},
+    visibility=#{visibility}, content=#{content} WHERE id=#{id}
   </update>
 
   <!-- delete -->
