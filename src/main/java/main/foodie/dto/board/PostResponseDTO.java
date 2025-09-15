@@ -1,6 +1,7 @@
 package main.foodie.dto.board;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import main.foodie.domain.board.Visibility;
@@ -22,6 +23,8 @@ public class PostResponseDTO {
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+
+//  private List<CommentResponseDTO> comments;
 
   public String getVisibility() {
     return visibility.name();

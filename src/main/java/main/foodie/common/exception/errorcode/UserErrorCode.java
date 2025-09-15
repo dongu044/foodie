@@ -1,4 +1,4 @@
-package main.foodie.common.exception.errorcode.domain;
+package main.foodie.common.exception.errorcode;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +11,7 @@ public enum UserErrorCode implements ErrorCode {
 
   USERID_DUPLICATED("USERID_DUPLICATED","error.user.userid.duplicated", HttpStatus.BAD_REQUEST),
   NICKNAME_DUPLICATED("NICKNAME_DUPLICATED","error.user.nickname.duplicated", HttpStatus.BAD_REQUEST),
+  USER_NOT_FOUND("USER_NOT_FOUND","error.user.notFound", HttpStatus.NOT_FOUND),
   USERID_INVALID("USERID_INVALID","error.user.userid.invalid", HttpStatus.BAD_REQUEST),
   PASSWORD_INVALID("PASSWORD_INVALID", "error.user.password.invalid", HttpStatus.BAD_REQUEST);
 

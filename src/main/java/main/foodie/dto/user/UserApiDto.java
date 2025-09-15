@@ -8,6 +8,7 @@ import main.foodie.domain.user.Role;
 @AllArgsConstructor
 public class UserApiDto {
 
+  private Long id;
   private String userId;
   private String nickname;
   private String email;

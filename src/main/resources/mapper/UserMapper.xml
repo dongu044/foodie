@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="main.foodie.mapper.UserDbMapper">
+<mapper namespace="main.foodie.mapper.UserMapper">
 <!-- signup -->
   <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO user (user_id, password, nickname, email, role)
     VALUES (#{userId}, #{password}, #{nickname}, #{email}, #{role})
   </insert>
-<!-- userId로 user 찾기 -->
+<!-- Id로 user 찾기 -->
+  <select id="findById" parameterType="Long" resultType="User">
+    SELECT * FROM user WHERE id=#{id}
+  </select>
+  <!-- userId로 user 찾기 -->
   <select id="findByUserId" parameterType="String" resultType="User">
     SELECT * FROM user WHERE user_id=#{userId}
   </select>

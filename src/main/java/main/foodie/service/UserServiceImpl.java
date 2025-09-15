@@ -1,15 +1,16 @@
 package main.foodie.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import main.foodie.common.exception.BusinessException;
-import main.foodie.common.exception.errorcode.domain.UserErrorCode;
+import main.foodie.common.exception.errorcode.UserErrorCode;
 import main.foodie.domain.user.Role;
 import main.foodie.domain.user.User;
 import main.foodie.dto.user.UserApiDto;
 import main.foodie.dto.user.UserSignUpDto;
-import main.foodie.dto.user.UserValidationDto;
-import main.foodie.mapper.UserDbMapper;
+import main.foodie.dto.user.UserLoginDTO;
 import main.foodie.mapper.UserMapper;
+import main.foodie.mapper.UserMapStruct;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +18,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-  private final UserDbMapper userDbMapper;
   private final UserMapper userMapper;
+  private final UserMapStruct userMapStruct;
   private final PasswordEncoder passwordEncoder;
 
   @Override
   public Long signUp(UserSignUpDto user) {
     isDuplicated(user);
-    User newUser = userMapper.signUpDtoToDomain(user);
+    User newUser = userMapStruct.signUpDtoToDomain(user);
     String encodedPassword = passwordEncoder.encode(user.getPassword());
     newUser.setPassword(encodedPassword);
     newUser.setRole(Role.USER);
-    return userDbMapper.save(newUser);
+    userMapper.save(newUser);
+    return newUser.getId();
   }
 
   private void isDuplicated(UserSignUpDto newUser) {
@@ -37,39 +39,55 @@ public class UserServiceImpl implements UserService {
   }
 
   private void isDuplicatedNickname(UserSignUpDto newUser) {
-    if (userDbMapper.findByNickname(newUser.getNickname()).isPresent()) {
+    if (userMapper.findByNickname(newUser.getNickname()).isPresent()) {
       throw new BusinessException(UserErrorCode.NICKNAME_DUPLICATED);
     }
   }
 
   private void isDuplicatedUserId(UserSignUpDto newUser) {
-    if (userDbMapper.findByUserId(newUser.getUserId()).isPresent()) {
+    if (userMapper.findByUserId(newUser.getUserId()).isPresent()) {
       throw new BusinessException(UserErrorCode.USERID_DUPLICATED);
     }
   }
 
   @Override
-  public UserApiDto login(UserValidationDto request) {
-    User userData = isValidUserId(request.getUserId());
+  public UserApiDto login(UserLoginDTO request) {
+    User user = getValidUser(request);
 
-    validatePassword(request.getPassword(), userData.getPassword());
+    validatePassword(request.getPassword(), user.getPassword());
 
-    return userMapper.toApiDto(userData);
+    return userMapStruct.toApiDto(user);
   }
 
-  public User isValidUserId(String userId) {
-    return userDbMapper.findByUserId(userId)
-        .orElseThrow(() -> new BusinessException(UserErrorCode.USERID_INVALID));
+  @Override
+  public User getValidUserById(Long id) {
+    return getUser(id).orElseThrow(
+        () -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+  }
+
+  public User getValidUser(UserLoginDTO request) {
+    return getUser(request.getUserId()).orElseThrow(
+        () -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+  }
+
+  @Override
+  public Optional<User> getUser(Long id) {
+    return userMapper.findById(id);
+  }
+
+  @Override
+  public Optional<User> getUser(String userId) {
+    return userMapper.findByUserId(userId);
   }
 
   @Override
   public void deleteUser(UserApiDto request, String password) {
-    User userData = userDbMapper.findByUserId(request.getUserId())
+    User userData = userMapper.findByUserId(request.getUserId())
         .orElseThrow(()-> new BusinessException(UserErrorCode.USERID_INVALID));
 
     validatePassword(password, userData.getPassword());
 
-    userDbMapper.deleteUser(userData.getUserId());
+    userMapper.deleteUser(userData.getUserId());
   }
 
   private void validatePassword(String rawPassword, String encodedPassword) {

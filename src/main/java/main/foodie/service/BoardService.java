@@ -1,7 +1,9 @@
 package main.foodie.service;
 
+import main.foodie.domain.board.Comment;
 import main.foodie.domain.board.Post;
-import main.foodie.dto.board.CommentDTO;
+import main.foodie.dto.board.CommentRequestDTO;
+import main.foodie.dto.board.CommentResponseDTO;
 import main.foodie.dto.board.PostCreateRequestDTO;
 import main.foodie.dto.board.PostResponseDTO;
 import main.foodie.dto.board.PostUpdateRequestDTO;
@@ -9,15 +11,19 @@ import main.foodie.dto.user.UserApiDto;
 
 public interface BoardService {
 
-  Long createPost(PostCreateRequestDTO createRequest, String userId);
+  Long createPost(PostCreateRequestDTO createRequest, Long userId);
 
-  PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest, Long id);
+  Post getPost(Long postId);
 
-  void deletePost(Long id);
+  PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest, Long postId, UserApiDto user);
 
-  void comment(CommentDTO commentRequest, String userId);
+  boolean deletePost(Long postId, UserApiDto user);
 
-  CommentDTO updateComment(Long id);
+  CommentResponseDTO createComment(CommentRequestDTO commentRequest, Long postId, UserApiDto user);
 
-  void deleteComment(Long id);
+  Comment getComment(Long commentId);
+
+  CommentResponseDTO updateComment(CommentRequestDTO requestDTO, Long postId, Long commentId, UserApiDto user);
+
+  boolean deleteComment(Long postId, Long commentId, UserApiDto user);
 }

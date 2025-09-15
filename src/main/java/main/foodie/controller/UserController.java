@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.foodie.common.reponse.ApiResponse;
 import main.foodie.dto.user.UserApiDto;
 import main.foodie.dto.user.UserSignUpDto;
-import main.foodie.dto.user.UserValidationDto;
+import main.foodie.dto.user.UserLoginDTO;
 import main.foodie.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +37,7 @@ public class UserController {
   @PostMapping("/login")
   @Operation(summary = "로그인", description = "로그인 및 세션에 회원정보 등록")
   public ResponseEntity<ApiResponse<Void>> login(
-      @Validated @RequestBody UserValidationDto user, HttpSession session) {
+      @Validated @RequestBody UserLoginDTO user, HttpSession session) {
     log.info("로그인 시도: {}", user.getUserId());
     UserApiDto apiDto = userService.login(user);
     session.setAttribute("user", apiDto);

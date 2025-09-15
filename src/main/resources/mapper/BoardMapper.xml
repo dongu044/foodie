@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.foodie.mapper.BoardMapper">
+
+  <resultMap id="PostResultMap" type="main.foodie.domain.board.Post">
+    <id property="id" column="id"/>
+    <result property="authorId" column="author_id"/>
+    <result property="nickname" column="nickname"/>
+    <result property="category" column="category"/>
+    <result property="title" column="title"/>
+    <result property="visibility" column="visibility"
+      typeHandler="main.foodie.domain.board.VisibilityTypeHandler"/>
+    <result property="content" column="content"/>
+    <result property="viewCount" column="view_count"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="commentCount" column="comment_count"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="deletedAt" column="deleted_at"/>
+  </resultMap>
+
+  <resultMap id="CommentResultMap" type="main.foodie.domain.board.Comment">
+    <id property="id" column="id"/>
+    <result property="postId" column="post_id"/>
+    <result property="parentId" column="parent_id"/>
+    <result property="authorId" column="author_id"/>
+    <result property="nickname" column="nickname"/>
+    <result property="visibility" column="visibility"
+      typeHandler="main.foodie.domain.board.VisibilityTypeHandler"/>
+    <result property="content" column="content"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="deleted" column="deleted"/>
+  </resultMap>
+
+  <!-- insert -->
+  <!-- 신규 post -->
+  <insert id="savePost" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO post (author_id, nickname, category, title, visibility, content)
+    VALUES (#{authorId}, #{nickname}, #{category}, #{title},
+    #{visibility, typeHandler=main.foodie.domain.board.VisibilityTypeHandler}, #{content})
+  </insert>
+
+  <!-- select -->
+  <!-- post 번호로 post 찾기 -->
+  <select id="findPostById" resultMap="PostResultMap">
+    SELECT * FROM post WHERE id=#{id} AND deleted_at IS NULL
+  </select>
+  <!-- nickname 으로 post 찾기 -->
+  <select id="findPostByNickname" parameterType="String" resultMap="PostResultMap">
+    SELECT *, MATCH(nickname) AGAINST(#{nickname} IN NATURAL LANGUAGE MODE) as relevance
+    FROM post
+    WHERE MATCH(nickname) AGAINST(#{nickname} IN NATURAL LANGUAGE MODE)
+    AND deleted_at IS NULL
+    ORDER BY relevance DESC, created_at DESC
+  </select>
+  <!-- 키워드로 title 찾기 -->
+  <select id="findPostByTitle" parameterType="String" resultMap="PostResultMap">
+    SELECT *, MATCH(title) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as relevance
+    FROM post
+    WHERE MATCH(title) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+    AND deleted_at IS NULL
+    ORDER BY relevance DESC, created_at DESC
+  </select>
+  <!-- 키워드로 title, content 찾기 -->
+  <select id="findPostByTitleAndContent" parameterType="String" resultMap="PostResultMap">
+    SELECT *, MATCH(title, content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as relevance
+    FROM post
+    WHERE MATCH(title, content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+    AND deleted_at IS NULL
+    ORDER BY relevance DESC, created_at DESC
+  </select>
+  <!-- 키워드로 title, content, nickname 찾기 -->
+  <select id="findPostByTitleAndContentAndNickname" parameterType="String"
+    resultMap="PostResultMap">
+    SELECT *, MATCH(title, content, nickname) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as
+    relevance
+    FROM post
+    WHERE MATCH(title, content, nickname) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
+    AND deleted_at IS NULL
+    ORDER BY relevance DESC, created_at DESC
+  </select>
+
+  <!-- post 업데이트 -->
+  <update id="updatePost">
+    UPDATE post
+    SET nickname=#{nickname},
+    category=#{category},
+    title=#{title},
+    visibility=#{visibility, typeHandler=main.foodie.domain.board.VisibilityTypeHandler},
+    content=#{content}
+    WHERE id=#{id} AND deleted_at IS NULL
+  </update>
+
+  <!-- delete -->
+  <!-- user 제거 -->
+  <delete id="deletePost">
+    DELETE FROM post WHERE id=#{id}
+  </delete>
+
+  <!-- 신규 comment -->
+  <insert id="saveComment" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO comment (post_id, parent_id, author_id, nickname, visibility, content)
+    VALUES (#{postId}, #{parentId}, #{authorId}, #{nickname},
+    #{visibility, typeHandler=main.foodie.domain.board.VisibilityTypeHandler}, #{content})
+  </insert>
+
+  <!--  comment 조회-->
+  <select id="findCommentById" resultMap="CommentResultMap">
+    SELECT * FROM comment
+    WHERE id = #{id} AND deleted = false
+  </select>
+
+  <!-- comment 수정 -->
+  <update id="updateComment">
+    UPDATE comment
+    SET
+    parent_id=#{parentId},
+    visibility=#{visibility, typeHandler=main.foodie.domain.board.VisibilityTypeHandler},
+    content=#{content}
+    WHERE id=#{id} AND deleted = false
+  </update>
+
+  <!--  comment 삭제(논리삭제)-->
+  <update id="softDeleteComment">
+    UPDATE comment SET deleted = true,
+    content = '삭제된 댓글입니다.'
+    WHERE id = #{id}
+  </update>
+</mapper>

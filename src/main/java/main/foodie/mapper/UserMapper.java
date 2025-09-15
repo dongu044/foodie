@@ -1,20 +1,23 @@
 package main.foodie.mapper;
 
 import java.util.List;
+import java.util.Optional;
 import main.foodie.domain.user.User;
-import main.foodie.dto.user.UserApiDto;
-import main.foodie.dto.user.UserSignUpDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.apache.ibatis.annotations.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface UserMapper {
+  Long save(User user);
 
-  @Mapping(target = "id", ignore = true)
-  @Mapping(target = "role", constant = "USER")
-  User signUpDtoToDomain(UserSignUpDto userDto);
+  Optional<User> findById(Long id);
 
-  UserApiDto toApiDto(User user);
+  Optional<User> findByUserId(String userId);
 
-  List<UserApiDto> toApiDtoList(List<User> Users);
+  Optional<String> findByNickname(String nickname);
+
+  void deleteUser(String userId);
+
+  List<User> findAll();
+
+  void clear();
 }

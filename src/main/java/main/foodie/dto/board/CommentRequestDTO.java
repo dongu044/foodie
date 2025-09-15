@@ -2,6 +2,8 @@ package main.foodie.dto.board;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +12,7 @@ import main.foodie.domain.board.Visibility;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDTO {
-
-  @NotBlank
-  private Long postId;
+public class CommentRequestDTO {
 
   @Nullable
   private Long parentId;
@@ -21,6 +20,6 @@ public class CommentDTO {
   @NotBlank
   private String content;
 
-  @NotBlank
+  @NotNull
   private Visibility visibility;
 }
