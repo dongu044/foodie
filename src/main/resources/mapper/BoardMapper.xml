@@ -83,6 +83,7 @@
     ORDER BY relevance DESC, created_at DESC
   </select>
 
+  <!--  update-->
   <!-- post 업데이트 -->
   <update id="updatePost">
     UPDATE post
@@ -94,11 +95,38 @@
     WHERE id=#{id} AND deleted_at IS NULL
   </update>
 
-  <!-- delete -->
-  <!-- user 제거 -->
-  <delete id="deletePost">
-    DELETE FROM post WHERE id=#{id}
+  <!--  post 좋아요-->
+  <!--  post 좋아요 생성-->
+  <insert id="insertPostLike">
+    INSERT INTO post_like (post_id, user_id)
+    VALUES (#{postId}, #{userId})
+  </insert>
+
+  <!-- post 좋아요 삭제 -->
+  <delete id="deletePostLike">
+    DELETE FROM post_like
+    WHERE post_id=#{postId} AND user_id = #{userId}
   </delete>
+
+  <!--  likeCount 증가-->
+  <update id="incrementPostLike">
+    UPDATE post
+    SET like_count = like_count + 1
+    WHERE id=#{postId}
+  </update>
+
+  <!-- likeCount 감소 -->
+  <update id="decrementPostLike">
+    UPDATE post
+    SET like_count = like_count - 1
+    WHERE id=#{postId}
+  </update>
+
+  <!-- post 삭제(논리삭제) -->
+  <update id="softDeletePost">
+    UPDATE post SET delete_at = NOW()
+    WHERE id=#{id}
+  </update>
 
   <!-- 신규 comment -->
   <insert id="saveComment" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
@@ -121,6 +149,33 @@
     visibility=#{visibility, typeHandler=main.foodie.domain.board.VisibilityTypeHandler},
     content=#{content}
     WHERE id=#{id} AND deleted = false
+  </update>
+
+  <!--  comment 좋아요-->
+  <!--  comment 좋아요 생성-->
+  <insert id="insertCommentLike">
+    INSERT INTO comment_like (comment_id, user_id)
+    VALUES (#{commentId}, #{userId})
+  </insert>
+
+  <!-- comment 좋아요 삭제 -->
+  <delete id="deleteCommentLike">
+    DELETE FROM comment_like
+    WHERE comment_id=#{commentId} AND user_id = #{userId}
+  </delete>
+
+  <!--  likeCount 증가-->
+  <update id="incrementCommentLike">
+    UPDATE comment
+    SET like_count = like_count + 1
+    WHERE id=#{commentId}
+  </update>
+
+  <!-- likeCount 감소 -->
+  <update id="decrementCommentLike">
+    UPDATE comment
+    SET like_count = like_count - 1
+    WHERE id=#{commentId}
   </update>
 
   <!--  comment 삭제(논리삭제)-->

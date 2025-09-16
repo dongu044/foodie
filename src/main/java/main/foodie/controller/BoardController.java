@@ -1,5 +1,7 @@
 package main.foodie.controller;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.foodie.common.argument.LoginUser;
@@ -33,7 +35,7 @@ public class BoardController {
   @PostMapping("/posts")
   public ResponseEntity<ApiResponse<Long>> createPost(
       @Validated @RequestBody PostCreateRequestDTO request, @LoginUser UserApiDto user) {
-    Long id = boardService.createPost(request, user.getId());
+    Long id = boardService.createPost(request, user);
     return ResponseEntity.ok(new ApiResponse<>("신규 게시글 등록", id));
   }
 
@@ -41,13 +43,21 @@ public class BoardController {
   public ResponseEntity<ApiResponse<PostResponseDTO>> updatePost(
       @Validated @RequestBody PostUpdateRequestDTO request, @PathVariable Long id,
       @LoginUser UserApiDto user) {
-    PostResponseDTO postResponseDTO = boardService.updatePost(request, id, user);
+    PostResponseDTO postResponseDTO = boardService.updatePost(request, id, user.getId());
     return ResponseEntity.ok(new ApiResponse<>("게시글 수정완료", postResponseDTO));
+  }
+
+  @PostMapping("/posts/{id}/like")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> togglePostLike(
+      @PathVariable Long id, @LoginUser UserApiDto user) {
+    boolean isLiked = boardService.togglePostLike(id, user.getId());
+    Map<String, Object> result = getToggleLikeMap(isLiked);
+    return ResponseEntity.ok(new ApiResponse<>("좋아요 처리완료", result));
   }
 
   @DeleteMapping("/posts/{id}")
   public ResponseEntity<ApiResponse<Boolean>> deletePost(@PathVariable Long id, UserApiDto user) {
-    boolean result = boardService.deletePost(id, user);
+    boolean result = boardService.deletePost(id, user.getId());
     return ResponseEntity.ok(new ApiResponse<>("게시글 삭제완료", result));
   }
 
@@ -61,17 +71,33 @@ public class BoardController {
 
   @PutMapping("/posts/{postId}/comments/{commentId}")
   public ResponseEntity<ApiResponse<CommentResponseDTO>> updateComment(
-      @Validated @RequestBody CommentRequestDTO request, @PathVariable Long postId, @PathVariable Long commentId,
+      @Validated @RequestBody CommentRequestDTO request, @PathVariable Long postId,
+      @PathVariable Long commentId,
       @LoginUser UserApiDto user) {
-    CommentResponseDTO response = boardService.updateComment(request, postId, commentId, user);
+    CommentResponseDTO response = boardService.updateComment(request, postId, commentId,
+        user.getId());
     return ResponseEntity.ok(new ApiResponse<>("댓글 수정완료", response));
+  }
+
+  @PostMapping("/posts/{postId}/comments/{commentId}/like")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> toggleCommentLike(
+      @PathVariable Long postId, @PathVariable Long commentId, @LoginUser UserApiDto user) {
+    boolean isLiked = boardService.toggleCommentLike(postId, commentId, user.getId());
+    return ResponseEntity.ok(new ApiResponse<>("좋아요 처리완료", getToggleLikeMap(isLiked)));
+  }
+
+  private static Map<String, Object> getToggleLikeMap(boolean isLiked) {
+    Map<String, Object> result = new HashMap<>();
+    result.put("isLiked", isLiked);
+    result.put("message", isLiked ? "좋아요" : "좋아요 취소");
+    return result;
   }
 
   @DeleteMapping("/posts/{postId}/comments/{commentId}")
   public ResponseEntity<ApiResponse<Boolean>> deleteComment(
       @PathVariable Long postId, @PathVariable Long commentId,
       @LoginUser UserApiDto user) {
-    Boolean result = boardService.deleteComment(postId, commentId, user);
+    Boolean result = boardService.deleteComment(postId, commentId, user.getId());
     return ResponseEntity.ok(new ApiResponse<>("댓글 삭제완료", result));
   }
 }

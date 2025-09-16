@@ -26,7 +26,7 @@ public interface BoardMapStruct {
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "deletedAt", ignore = true)
-  Post toPost(PostCreateRequestDTO dto, User user);
+  Post toPost(PostCreateRequestDTO dto, UserApiDto user);
 
   PostResponseDTO toPostResponseDTO(Post post);
 

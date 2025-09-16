@@ -6,7 +6,6 @@ import main.foodie.common.exception.errorcode.BoardErrorCode;
 import main.foodie.common.exception.errorcode.CommonErrorCode;
 import main.foodie.domain.board.Comment;
 import main.foodie.domain.board.Post;
-import main.foodie.domain.user.User;
 import main.foodie.dto.board.CommentRequestDTO;
 import main.foodie.dto.board.CommentResponseDTO;
 import main.foodie.dto.board.CommentUpdateDTO;
@@ -29,9 +28,7 @@ public class BoardServiceImpl implements BoardService{
   private final UserService userService;
 
   @Override
-  public Long createPost(PostCreateRequestDTO request, Long userId) {
-    User user = userService.getValidUserById(userId);
-
+  public Long createPost(PostCreateRequestDTO request, UserApiDto user) {
     Post post = boardMapStruct.toPost(request, user);
 
     boardMapper.savePost(post);
@@ -45,8 +42,8 @@ public class BoardServiceImpl implements BoardService{
   }
 
   @Override
-  public PostResponseDTO updatePost(PostUpdateRequestDTO request, Long postId, UserApiDto user) {
-    Post post = getPostWithAuthorityCheck(postId, user);
+  public PostResponseDTO updatePost(PostUpdateRequestDTO request, Long postId, Long userId) {
+    Post post = getPostWithAuthorityCheck(postId, userId);
 
     if (boardMapper.updatePost(request, post.getId()) == 0) {
       throw new BusinessException(CommonErrorCode.UPDATE_FAILED);
@@ -58,20 +55,36 @@ public class BoardServiceImpl implements BoardService{
   }
 
   @Override
-  public boolean deletePost(Long postId, UserApiDto user) {
-    getPostWithAuthorityCheck(postId, user);
-    boardMapper.deletePost(postId);
+  public boolean togglePostLike(Long postId, Long userId) {
+    getPost(postId);
+
+    int deletedRows = boardMapper.deletePostLike(postId, userId);
+
+    if (deletedRows > 0) {
+      boardMapper.decrementPostLike(postId);
+      return false;
+    } else {
+      boardMapper.insertPostLike(postId, userId);
+      boardMapper.incrementPostLike(postId);
+      return true;
+    }
+  }
+
+  @Override
+  public boolean deletePost(Long postId, Long userId) {
+    getPostWithAuthorityCheck(postId, userId);
+    boardMapper.softDeletePost(postId);
     return true;
   }
 
-  private Post getPostWithAuthorityCheck(Long postId, UserApiDto user) {
+  private Post getPostWithAuthorityCheck(Long postId, Long userId) {
     Post post = getPost(postId);
-    validatePostAuthor(user, post);
+    validatePostAuthor(userId, post);
     return post;
   }
 
-  private static void validatePostAuthor(UserApiDto user, Post post) {
-    if (!post.getAuthorId().equals(user.getId())) {
+  private static void validatePostAuthor(Long userId, Post post) {
+    if (!post.getAuthorId().equals(userId)) {
       throw new BusinessException(BoardErrorCode.POST_ACCESS_DENIED);
     }
   }
@@ -108,8 +121,8 @@ public class BoardServiceImpl implements BoardService{
 
   @Override
   public CommentResponseDTO updateComment(CommentRequestDTO request, Long postId, Long commentId,
-      UserApiDto user) {
-    Comment comment = getCommentWithValidation(postId, commentId, user);
+      Long userId) {
+    Comment comment = getCommentWithAuthorityCheck(postId, commentId, userId);
     CommentUpdateDTO updateDTO = CommentUpdateDTO.of(request, commentId);
     if (boardMapper.updateComment(updateDTO) == 0) {
       throw new BusinessException(CommonErrorCode.UPDATE_FAILED);
@@ -117,20 +130,36 @@ public class BoardServiceImpl implements BoardService{
     return boardMapStruct.toCommentResponseDTO(comment);
   }
 
-  private Comment getCommentWithValidation(Long postId, Long commentId, UserApiDto user) {
+  @Override
+  public boolean toggleCommentLike(Long postId, Long commentId, Long userId) {
+    getPost(postId);
+    getComment(commentId);
+    int deletedRows = boardMapper.deleteCommentLike(commentId, userId);
+    if (deletedRows > 0) {
+      boardMapper.decrementCommentLike(commentId);
+      return false;
+    } else {
+      boardMapper.insertCommentLike(commentId, userId);
+      boardMapper.incrementCommentLike(commentId);
+      return true;
+    }
+  }
+
+
+  private Comment getCommentWithAuthorityCheck(Long postId, Long commentId, Long userId) {
     Comment comment = getComment(commentId);
-    if (!comment.getAuthorId().equals(user.getId())) {
+    if (!comment.getAuthorId().equals(userId)) {
       throw new BusinessException(BoardErrorCode.COMMENT_ACCESS_DENIED);
     }
     if (!comment.getPostId().equals(postId)) {
-      throw new BusinessException(BoardErrorCode.COMMENT_ACCESS_DENIED);
+      throw new BusinessException(BoardErrorCode.POST_ACCESS_DENIED);
     }
     return comment;
   }
 
   @Override
-  public boolean deleteComment(Long postId, Long commentId, UserApiDto user) {
-    getCommentWithValidation(postId, commentId, user);
+  public boolean deleteComment(Long postId, Long commentId, Long userId) {
+    getCommentWithAuthorityCheck(postId, commentId, userId);
     boardMapper.softDeleteComment(commentId);
     return true;
   }
