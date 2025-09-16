@@ -1,7 +1,10 @@
 package main.foodie.service;
 
+import java.util.List;
 import main.foodie.domain.board.Comment;
 import main.foodie.domain.board.Post;
+import main.foodie.dto.PageRequestDTO;
+import main.foodie.dto.PageResponseDTO;
 import main.foodie.dto.board.CommentRequestDTO;
 import main.foodie.dto.board.CommentResponseDTO;
 import main.foodie.dto.board.PostCreateRequestDTO;
@@ -16,7 +19,7 @@ public interface BoardService {
 
   Post getPost(Long postId);
 
-//  List<Post> getPostList();
+  PageResponseDTO<Post> getPostList(PageRequestDTO pageRequest);
 
   PostResponseDTO updatePost(PostUpdateRequestDTO updateRequest, Long postId, Long userId);
 

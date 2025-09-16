@@ -35,6 +35,51 @@
     <result property="deleted" column="deleted"/>
   </resultMap>
 
+  <!-- 게시글 기본 컬럼 -->
+  <sql id="postColumns">
+    id, author_id, nickname, category, title, visibility,
+    content, view_count, like_count, comment_count,
+    created_at, updated_at, deleted_at
+  </sql>
+
+  <!-- 검색 조건 -->
+  <sql id="searchConditions">
+    WHERE deleted_at IS NULL
+
+    <!-- 키워드 검색 -->
+    <if test="pageRequestDTO.keyword != null and pageRequestDTO.keyword != ''">
+      AND (
+      title LIKE CONCAT('%', #{pageRequestDTO.keyword}, '%')
+      OR content LIKE CONCAT('%', #{pageRequestDTO.keyword}, '%')
+      OR nickname LIKE CONCAT('%', #{pageRequestDTO.keyword}, '%')
+      )
+    </if>
+
+    <!-- 카테고리 필터 -->
+    <if test="pageRequestDTO.category != null and pageRequestDTO.category != ''">
+      AND category = #{pageRequestDTO.category}
+    </if>
+  </sql>
+
+  <!-- 정렬 조건 -->
+  <sql id="orderByClause">
+    ORDER BY
+    <choose>
+      <when test="pageRequestDTO.safeSort == 'view_count'">
+        view_count ${pageRequestDTO.safeDir}, created_at DESC
+      </when>
+      <when test="pageRequestDTO.safeSort == 'like_count'">
+        like_count ${pageRequestDTO.safeDir}, created_at DESC
+      </when>
+      <when test="pageRequestDTO.safeSort == 'comment_count'">
+        comment_count ${pageRequestDTO.safeDir}, created_at DESC
+      </when>
+      <otherwise>
+        created_at ${pageRequestDTO.safeDir}
+      </otherwise>
+    </choose>
+  </sql>
+
   <!-- insert -->
   <!-- 신규 post -->
   <insert id="savePost" useGeneratedKeys="true" keyProperty="id">
@@ -44,43 +89,26 @@
   </insert>
 
   <!-- select -->
-  <!-- post 번호로 post 찾기 -->
-  <select id="findPostById" resultMap="PostResultMap">
+  <!-- 단일 post 조회 -->
+  <select id="selectPostById" resultMap="PostResultMap">
     SELECT * FROM post WHERE id=#{id} AND deleted_at IS NULL
   </select>
-  <!-- nickname 으로 post 찾기 -->
-  <select id="findPostByNickname" parameterType="String" resultMap="PostResultMap">
-    SELECT *, MATCH(nickname) AGAINST(#{nickname} IN NATURAL LANGUAGE MODE) as relevance
+
+  <!--  전체 post 페이징 조회-->
+  <select id="selectPostsWithPaging" resultType="Post">
+    SELECT
+    <include refid="postColumns"/>
     FROM post
-    WHERE MATCH(nickname) AGAINST(#{nickname} IN NATURAL LANGUAGE MODE)
-    AND deleted_at IS NULL
-    ORDER BY relevance DESC, created_at DESC
+    <include refid="searchConditions"/>
+    <include refid="orderByClause"/>
+    LIMIT #{pageRequestDTO.size} OFFSET #{pageRequestDTO.offset}
   </select>
-  <!-- 키워드로 title 찾기 -->
-  <select id="findPostByTitle" parameterType="String" resultMap="PostResultMap">
-    SELECT *, MATCH(title) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as relevance
+
+  <!-- 전체 게시글 수 조회 -->
+  <select id="countPosts" resultType="long">
+    SELECT COUNT(*)
     FROM post
-    WHERE MATCH(title) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-    AND deleted_at IS NULL
-    ORDER BY relevance DESC, created_at DESC
-  </select>
-  <!-- 키워드로 title, content 찾기 -->
-  <select id="findPostByTitleAndContent" parameterType="String" resultMap="PostResultMap">
-    SELECT *, MATCH(title, content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as relevance
-    FROM post
-    WHERE MATCH(title, content) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-    AND deleted_at IS NULL
-    ORDER BY relevance DESC, created_at DESC
-  </select>
-  <!-- 키워드로 title, content, nickname 찾기 -->
-  <select id="findPostByTitleAndContentAndNickname" parameterType="String"
-    resultMap="PostResultMap">
-    SELECT *, MATCH(title, content, nickname) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE) as
-    relevance
-    FROM post
-    WHERE MATCH(title, content, nickname) AGAINST(#{keyword} IN NATURAL LANGUAGE MODE)
-    AND deleted_at IS NULL
-    ORDER BY relevance DESC, created_at DESC
+    <include refid="searchConditions"/>
   </select>
 
   <!--  update-->

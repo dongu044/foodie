@@ -1,11 +1,15 @@
 package main.foodie.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.foodie.common.exception.BusinessException;
 import main.foodie.common.exception.errorcode.BoardErrorCode;
 import main.foodie.common.exception.errorcode.CommonErrorCode;
 import main.foodie.domain.board.Comment;
 import main.foodie.domain.board.Post;
+import main.foodie.dto.PageRequestDTO;
+import main.foodie.dto.PageResponseDTO;
 import main.foodie.dto.board.CommentRequestDTO;
 import main.foodie.dto.board.CommentResponseDTO;
 import main.foodie.dto.board.CommentUpdateDTO;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class BoardServiceImpl implements BoardService{
 
   private final BoardMapper boardMapper;
@@ -38,7 +43,26 @@ public class BoardServiceImpl implements BoardService{
 
   @Override
   public Post getPost(Long postId) {
-   return boardMapper.findPostById(postId).orElseThrow(()-> new BusinessException(BoardErrorCode.POST_NOT_FOUND));
+   return boardMapper.selectPostById(postId).orElseThrow(()-> new BusinessException(BoardErrorCode.POST_NOT_FOUND));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public PageResponseDTO<Post> getPostList(PageRequestDTO pageRequest) {
+    log.info("게시글 목록 조회 - 페이지: {}, 크기: {}, 정렬: {} {}",
+        pageRequest.getPage(), pageRequest.getSize(),
+        pageRequest.getSortBy(), pageRequest.getSortDir());
+    if (pageRequest.getSize() > 100) {
+      pageRequest.setSize(100);
+    }
+    if (pageRequest.getPage() < 1) {
+      pageRequest.setSize(1);
+    }
+
+    List<Post> posts = boardMapper.selectPostWithPaging(pageRequest);
+    long totalElements = boardMapper.countPosts(pageRequest);
+    log.info("조회 완료 - 총 {}건 중 {}개 조회", totalElements, posts.size());
+    return PageResponseDTO.of(posts,totalElements,pageRequest);
   }
 
   @Override
@@ -115,7 +139,7 @@ public class BoardServiceImpl implements BoardService{
   }
 
   public Comment getComment(Long commentId) {
-    return boardMapper.findCommentById(commentId)
+    return boardMapper.selectCommentById(commentId)
         .orElseThrow(() -> new BusinessException(BoardErrorCode.COMMENT_NOT_FOUND));
   }
 

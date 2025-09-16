@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import main.foodie.common.argument.LoginUser;
 import main.foodie.common.reponse.ApiResponse;
 import main.foodie.domain.board.Post;
+import main.foodie.dto.PageRequestDTO;
+import main.foodie.dto.PageResponseDTO;
 import main.foodie.dto.board.CommentRequestDTO;
 import main.foodie.dto.board.CommentResponseDTO;
 import main.foodie.dto.board.PostCreateRequestDTO;
@@ -14,14 +16,17 @@ import main.foodie.dto.board.PostResponseDTO;
 import main.foodie.dto.board.PostUpdateRequestDTO;
 import main.foodie.dto.user.UserApiDto;
 import main.foodie.service.BoardService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -31,6 +36,42 @@ import org.springframework.web.bind.annotation.RestController;
 public class BoardController {
 
   private final BoardService boardService;
+
+  @GetMapping("/posts")
+  public ResponseEntity<ApiResponse<PageResponseDTO<Post>>> getPosts(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(defaultValue = "created_at") String sortBy,
+      @RequestParam(defaultValue = "DESC") String sortDir,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category
+  ) {
+    PageRequestDTO pageRequest = PageRequestDTO.builder()
+        .page(page)
+        .size(size)
+        .sortBy(sortBy)
+        .sortDir(sortDir)
+        .keyword(keyword)
+        .category(category)
+        .build();
+
+    PageResponseDTO<Post> response = boardService.getPostList(pageRequest);
+    return ResponseEntity.ok(new ApiResponse<>("게시글 목록 조회 완료", response));
+  }
+
+  @GetMapping("/posts/{type}")
+  public ResponseEntity<ApiResponse<PageResponseDTO<Post>>> getPostsByType(
+      @PathVariable String type,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String category
+  ) {
+    PageRequestDTO pageRequest = PageRequestDTO.of(type, page, size, keyword, category);
+
+    PageResponseDTO<Post> response = boardService.getPostList(pageRequest);
+    return ResponseEntity.ok(new ApiResponse<>(type + "게시글 조회 완료", response));
+  }
 
   @PostMapping("/posts")
   public ResponseEntity<ApiResponse<Long>> createPost(

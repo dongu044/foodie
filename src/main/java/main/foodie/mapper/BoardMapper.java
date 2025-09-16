@@ -4,27 +4,25 @@ import java.util.List;
 import java.util.Optional;
 import main.foodie.domain.board.Comment;
 import main.foodie.domain.board.Post;
+import main.foodie.dto.PageRequestDTO;
 import main.foodie.dto.board.CommentRequestDTO;
 import main.foodie.dto.board.CommentUpdateDTO;
 import main.foodie.dto.board.PostLikeDTO;
 import main.foodie.dto.board.PostUpdateRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.PageRequest;
 
 @Mapper
 public interface BoardMapper {
 
   Long savePost(Post post);
 
-  Optional<Post> findPostById(Long id);
+  Optional<Post> selectPostById(Long id);
 
-  List<Post> findPostByNickname(String nickname);
+  List<Post> selectPostWithPaging(@Param("pageRequest") PageRequestDTO pageRequest);
 
-  List<Post> findPostByTitle(String keyword);
-
-  List<Post> findPostByTitleAndContent(String keyword);
-
-  List<Post> findPostByTitleAndContentAndNickname(String keyword);
+  long countPosts(@Param("pageRequest") PageRequestDTO pageRequest);
 
   int insertPostLike(@Param("postId") Long postId, @Param("userId")Long userId);
 
@@ -40,7 +38,7 @@ public interface BoardMapper {
 
   Long saveComment(Comment comment);
 
-  Optional<Comment> findCommentById(Long id);
+  Optional<Comment> selectCommentById(Long id);
 
   int updateComment(CommentUpdateDTO updateDTO);
 
